@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Portafolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="toggle-dark" id="toggle-dark" onclick="toggleModoOscuro()">🌙 Modo Oscuro</button>
+
+    <nav class="nav-bar">
+        <button class="nav-btn active" id="nav-inicio" onclick="mostrarInicio()">🏠 Inicio</button>
+        <button class="nav-btn" id="nav-corte1" onclick="mostrarCorte1()">📂 Corte 1</button>
+        <button class="nav-btn" id="nav-corte2" onclick="mostrarCorte2()">📂 Corte 2</button>
+    </nav>
+
+    <!-- VISTA INICIO -->
+    <div class="vista" id="vista-inicio">
+        <div class="welcome">
+            <h1>BIENVENIDOS A EL PORTAFOLIO DE MULTIMEDIA</h1>
+            <p>Selecciona una opción del menú para ver los trabajos de cada corte.</p>
+        </div>
+    </div>
+
+    <!-- VISTA CORTE 1 -->
+    <div class="vista" id="vista-corte1">
+        <div class="corte corte-1">
+            <div class="corte-header">Corte 1</div>
+            <div class="subsecciones">
+                <div class="subseccion" id="c1-presentaciones">
+                    <h3>📊 Presentaciones</h3>
+                    <div class="upload-area" onclick="document.getElementById('file-presentaciones').click()">
+                        <div class="icon-grande">📁</div>
+                        <p>Haz clic para subir una presentaci&oacute;n</p>
+                    </div>
+                    <input type="file" id="file-presentaciones" accept=".ppt,.pptx,.pdf,.key,.odp" multiple onchange="agregarItem('c1-presentaciones', this)">
+                    <ul class="lista-items" id="lista-c1-presentaciones">
+                        <li class="vacio">No hay presentaciones a&uacute;n</li>
+                    </ul>
+                </div>
+                <div class="subseccion" id="c1-videos">
+                    <h3>🎬 Videos</h3>
+                    <div class="upload-area" onclick="document.getElementById('file-videos').click()">
+                        <div class="icon-grande">🎥</div>
+                        <p>Haz clic para subir un video</p>
+                    </div>
+                    <input type="file" id="file-videos" accept="video/*" multiple onchange="agregarItem('c1-videos', this)">
+                    <ul class="lista-items" id="lista-c1-videos">
+                        <li class="vacio">No hay videos a&uacute;n</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA CORTE 2 -->
+    <div class="vista" id="vista-corte2">
+        <div class="corte corte-2">
+            <div class="corte-header">Corte 2</div>
+            <div class="corte2-grid">
+                <!-- SCRATCH -->
+                <div class="subseccion">
+                    <h3>🐱 Proyectos Scratch</h3>
+                    <div class="scratch-embed-form">
+                        <p>Pega el código embed de un proyecto de Scratch para jugar aquí mismo:</p>
+                        <div class="embed-input-group">
+                            <input type="text" id="embed-input" placeholder='&lt;iframe src="https://scratch.mit.edu/projects/..."&gt;&lt;/iframe&gt;'>
+                            <button class="btn btn-agregar-embed" onclick="agregarEmbed()">+ Agregar</button>
+                        </div>
+                    </div>
+                    <div class="scratch-grid" id="scratch-grid"></div>
+                </div>
+
+                <!-- APP INVENTOR -->
+                <div class="subseccion">
+                    <h3>📱 App Inventor</h3>
+                    <div class="app-inventor-form">
+                        <p>Agrega un enlace a tu proyecto App Inventor:</p>
+                        <div class="embed-input-group">
+                            <input type="url" id="inventor-link-input" placeholder="https://ai2.appinventor.mit.edu/...">
+                            <button class="btn btn-agregar-embed" onclick="agregarLinkInventor()">+ Agregar</button>
+                        </div>
+                    </div>
+                    <div class="upload-area" onclick="document.getElementById('file-inventor-qr').click()">
+                        <div class="icon-grande">📷</div>
+                        <p>Haz clic para subir un código QR</p>
+                    </div>
+                    <input type="file" id="file-inventor-qr" accept="image/*" multiple onchange="agregarItem('c2-inventor', this)">
+                    <div class="inventor-links" id="inventor-links"></div>
+                    <ul class="lista-items" id="lista-c2-inventor">
+                        <li class="vacio">No hay proyectos App Inventor a&uacute;n</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal" onclick="cerrarModal(event)">
+        <div class="modal-content">
+            <button class="modal-cerrar" onclick="cerrarModal()">&times;</button>
+            <div class="modal-nombre" id="modal-nombre"></div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
