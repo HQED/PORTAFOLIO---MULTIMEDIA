@@ -1,8 +1,18 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-import { getStorage } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBkh1fHGFArpWwBkNOqGfTNYuaSQ-bOQGA",
@@ -22,51 +32,100 @@ const storage = getStorage(app);
 console.log("Firebase conectado");
 
 
-function agregarItem(seccionId, input) {
+async function agregarItem(seccionId, input) {
     const lista = document.getElementById('lista-' + seccionId);
     const vacio = lista.querySelector('.vacio');
+
     if (vacio) vacio.remove();
 
     for (const file of input.files) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const dataUrl = e.target.result;
-            const li = document.createElement('li');
-            li.className = 'item-archivo';
-            const ext = file.name.split('.').pop().toLowerCase();
-            const icono = obtenerIcono(file.name);
 
-            let previewHtml = '';
-            if (['png','jpg','jpeg','gif','svg','webp'].includes(ext)) {
-                previewHtml = `<div class="item-preview"><img src="${dataUrl}" alt="${file.name}"></div>`;
-            } else if (['mp4','webm','avi','mov','mkv','ogg'].includes(ext)) {
-                previewHtml = `<div class="item-preview"><video controls src="${dataUrl}"></video></div>`;
-            } else if (ext === 'pdf') {
-                previewHtml = `<div class="item-preview"><iframe src="${dataUrl}"></iframe></div>`;
-            } else if (['txt','html','htm','css','js','json','xml','md','csv'].includes(ext)) {
-                const text = atob(dataUrl.split(',')[1]);
-                const escaped = text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-                previewHtml = `<div class="item-preview code-preview">${escaped}</div>`;
-            } else {
-                previewHtml = `<div class="item-preview"><span class="placeholder">📄</span></div>`;
-            }
+        const archivoRef = ref(storage, `archivos/${file.name}`);
 
-            li.innerHTML = `
-                <div class="item-header">
-                    <span class="nombre">${icono} ${file.name}</span>
-                    <div class="item-acciones">
-                        <button class="btn btn-maximizar" onclick="maximizarVistaPrevia(this)">Maximizar</button>
-                        <a class="btn btn-descargar" href="${dataUrl}" download="${file.name}">Descargar</a>
-                        <button class="btn btn-eliminar" onclick="eliminarItem(this)">&times;</button>
-                    </div>
+        await uploadBytes(archivoRef, file);
+
+        const url = await getDownloadURL(archivoRef);
+
+        await addDoc(collection(db, "archivos"), {
+            nombre: file.name,
+            url: url,
+            seccion: seccionId
+        });
+
+        console.log("Archivo subido:", url);
+
+        const li = document.createElement('li');
+
+        li.className = 'item-archivo';
+
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        const icono = obtenerIcono(file.name);
+
+        let previewHtml = '';
+
+        if (['png','jpg','jpeg','gif','svg','webp'].includes(ext)) {
+
+            previewHtml = `
+                <div class="item-preview">
+                    <img src="${url}" alt="${file.name}">
                 </div>
-                ${previewHtml}
             `;
-            lista.appendChild(li);
-        };
-        reader.readAsDataURL(file);
+
+        } else if (['mp4','webm','avi','mov','mkv','ogg'].includes(ext)) {
+
+            previewHtml = `
+                <div class="item-preview">
+                    <video controls src="${url}"></video>
+                </div>
+            `;
+
+        } else if (ext === 'pdf') {
+
+            previewHtml = `
+                <div class="item-preview">
+                    <iframe src="${url}"></iframe>
+                </div>
+            `;
+
+        } else {
+
+            previewHtml = `
+                <div class="item-preview">
+                    <span class="placeholder">📄</span>
+                </div>
+            `;
+        }
+
+        li.innerHTML = `
+            <div class="item-header">
+                <span class="nombre">${icono} ${file.name}</span>
+
+                <div class="item-acciones">
+
+                    <button class="btn btn-maximizar" onclick="maximizarVistaPrevia(this)">
+                        Maximizar
+                    </button>
+
+                    <a class="btn btn-descargar" href="${url}" download="${file.name}">
+                        Descargar
+                    </a>
+
+                    <button class="btn btn-eliminar" onclick="eliminarItem(this)">
+                        &times;
+                    </button>
+
+                </div>
+            </div>
+
+            ${previewHtml}
+        `;
+
+        lista.appendChild(li);
     }
+
     input.value = '';
+
     if (lista.children.length === 0) {
         lista.innerHTML = '<li class="vacio">No hay elementos a&uacute;n</li>';
     }
