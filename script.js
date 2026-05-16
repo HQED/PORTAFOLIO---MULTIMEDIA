@@ -1,95 +1,39 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBkh1fHGFArpWwBkNOqGfTNYuaSQ-bOQGA",
-  authDomain: "db---portafolio---multimedia.firebaseapp.com",
-  projectId: "db---portafolio---multimedia",
-  storageBucket: "db---portafolio---multimedia.firebasestorage.app",
-  messagingSenderId: "357260603224",
-  appId: "1:357260603224:web:1dfc10a7796662a3b6bf2d"
-};
-
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-const storage = getStorage(app);
-
-console.log("Firebase conectado");
-
-
-async function agregarItem(seccionId, input) {
+function agregarItem(seccionId, input) {
     const lista = document.getElementById('lista-' + seccionId);
     const vacio = lista.querySelector('.vacio');
 
     if (vacio) vacio.remove();
 
     for (const file of input.files) {
-
-        const archivoRef = ref(storage, `archivos/${file.name}`);
-
-        await uploadBytes(archivoRef, file);
-
-        const url = await getDownloadURL(archivoRef);
-
-        await addDoc(collection(db, "archivos"), {
-            nombre: file.name,
-            url: url,
-            seccion: seccionId
-        });
-
-        console.log("Archivo subido:", url);
+        const url = URL.createObjectURL(file);
 
         const li = document.createElement('li');
-
         li.className = 'item-archivo';
 
         const ext = file.name.split('.').pop().toLowerCase();
-
         const icono = obtenerIcono(file.name);
 
         let previewHtml = '';
 
         if (['png','jpg','jpeg','gif','svg','webp'].includes(ext)) {
-
             previewHtml = `
                 <div class="item-preview">
                     <img src="${url}" alt="${file.name}">
                 </div>
             `;
-
         } else if (['mp4','webm','avi','mov','mkv','ogg'].includes(ext)) {
-
             previewHtml = `
                 <div class="item-preview">
                     <video controls src="${url}"></video>
                 </div>
             `;
-
         } else if (ext === 'pdf') {
-
             previewHtml = `
                 <div class="item-preview">
                     <iframe src="${url}"></iframe>
                 </div>
             `;
-
         } else {
-
             previewHtml = `
                 <div class="item-preview">
                     <span class="placeholder">📄</span>
@@ -100,24 +44,18 @@ async function agregarItem(seccionId, input) {
         li.innerHTML = `
             <div class="item-header">
                 <span class="nombre">${icono} ${file.name}</span>
-
                 <div class="item-acciones">
-
                     <button class="btn btn-maximizar" onclick="maximizarVistaPrevia(this)">
                         Maximizar
                     </button>
-
                     <a class="btn btn-descargar" href="${url}" download="${file.name}">
                         Descargar
                     </a>
-
                     <button class="btn btn-eliminar" onclick="eliminarItem(this)">
                         &times;
                     </button>
-
                 </div>
             </div>
-
             ${previewHtml}
         `;
 
@@ -389,18 +327,4 @@ function renderLinksInventor() {
     }
 })();
 
-// Exponer funciones al ámbito global para los onclick del HTML
-window.mostrarInicio = mostrarInicio;
-window.mostrarCorte1 = mostrarCorte1;
-window.mostrarCorte2 = mostrarCorte2;
-window.toggleModoOscuro = toggleModoOscuro;
-window.agregarItem = agregarItem;
-window.eliminarItem = eliminarItem;
-window.maximizarVistaPrevia = maximizarVistaPrevia;
-window.cerrarModal = cerrarModal;
-window.agregarEmbed = agregarEmbed;
-window.eliminarEmbed = eliminarEmbed;
-window.agregarLinkInventor = agregarLinkInventor;
-window.eliminarLinkInventor = eliminarLinkInventor;
-window.renderEmbeds = renderEmbeds;
-window.renderLinksInventor = renderLinksInventor;
+
