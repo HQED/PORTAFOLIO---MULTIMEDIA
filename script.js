@@ -388,3 +388,19 @@ function renderLinksInventor() {
         guardarEmbeds([{ src: 'https://scratch.mit.edu/projects/1320425607/embed', id: Date.now() }]);
     }
 })();
+
+// Exponer funciones al ámbito global para los onclick del HTML
+window.mostrarInicio = mostrarInicio;
+window.mostrarCorte1 = mostrarCorte1;
+window.mostrarCorte2 = mostrarCorte2;
+window.toggleModoOscuro = toggleModoOscuro;
+window.agregarItem = agregarItem;
+window.eliminarItem = eliminarItem;
+window.maximizarVistaPrevia = maximizarVistaPrevia;
+window.cerrarModal = cerrarModal;
+window.agregarEmbed = agregarEmbed;
+window.eliminarEmbed = eliminarEmbed;
+window.agregarLinkInventor = agregarLinkInventor;
+window.eliminarLinkInventor = eliminarLinkInventor;
+window.renderEmbeds = renderEmbeds;
+window.renderLinksInventor = renderLinksInventor;
